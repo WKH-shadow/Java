@@ -1,54 +1,49 @@
-package HTTP;
+package myHttp;
 
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 输出信息
- */
 public class myHttpResponse {
-    //1.首行信息【http版本号+状态码+状态描述符】
+    //1.首行信息【版本号 状态码 状态描述符】
 
-    //版本号，因为版本号是固定的，不可修改的，那么我们可以设置成静态变量，并且用final修饰,然后返回的是HTTP/1.1
-    private static final String version = "HTTP/1.1";
+    //1.版本号,因为其是固定的不可变的
+    private  static  final String version = "HTTP/1.1";
 
     //状态码
-    private Integer state;
+    private  Integer state;
 
     //状态描述符
     private String stateMessage;
 
-    //2.header（响应报文头）其中（Content—Type和Content—Length）很重要,而且它是以key: value的形式存储的
+    //2.header(最重要的Content-Type(Java会自动生成)   Content-Length)
     Map<String,String> responseHeader = new HashMap<>();
 
-
-    //3.空行
+    //3.换行
 
     //4.body
-    //这个是服务器自定义返回的一个信息,因为String的性能很低，而且会产生很多的垃圾，所以我们使用StringBuffer
     StringBuffer responseBody = new StringBuffer();
 
     //这里要严格遵循HTTP协议的格式输出
     public void flush(PrintWriter writer){
-        //1.先输出首行,注意：按照空格进行分隔
+        //然后先输出首行
         writer.println(String.format("%s %d %s",version,this.state,this.stateMessage));
-
-        //2.写入header内容（Content—Type（会自己进行设置）和Content—Length（不会进行设置，所以要自己写））
-        for (Map.Entry<String,String> item:responseHeader.entrySet()){
-            //key Value,拼接输出时要以“: ”（冒号+空格）进行分隔输出
+        //然后写入header的内容，遍历responseHeader中的内容
+        for (Map.Entry<String,String> item:responseHeader.entrySet()
+             ) {
+            //然后没读取一行数据，让其用“： ”（冒号+空格）进行拼接
             writer.println(String.format("%s: %s",item.getKey(),item.getValue()));
         }
-        //添加一个Content—Length
-        writer.println("Content—Length: "+responseBody.toString().getBytes().length);
+        //然后要加上一个Content-length,这个长度就是body的长度
+        writer.println("Content-length: "+responseBody.toString().getBytes().length);
         //输出空行
         writer.println();
-
-        //输出body
+        //返回body信息
         writer.println(responseBody.toString());
+        //最后进行flush操作
+        writer.flush();
     }
-
-    //因为它是需要写入的，所以需要提供set方法，需要手动添加一个header方法
+    //提供set方法
 
     public void setState(Integer state) {
         this.state = state;
@@ -58,16 +53,11 @@ public class myHttpResponse {
         this.stateMessage = stateMessage;
     }
 
-    //每次可能就只写入一段内容那么就每次把body内容加进去
     public void setResponseBody(String body) {
         this.responseBody.append(body);
     }
-
-    //需要设置两个值，一个key，一个value，然后把这个key和value放入responseHeader中
+    //手动写一个map的set方法
     public void setResponseHeader(String key,String value){
-        this.responseHeader.put(key,value);
-
+     this.responseHeader.put(key,value);
     }
-
-
 }
