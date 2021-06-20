@@ -1,46 +1,36 @@
-package JavaPractice;
+package TestDemo;
 
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 /**
- * 括号匹配问题
- * 方法：
- * 1.遍历当前字符串，如果是左括号就入栈
- * 2.当 当前的字符串的字符是右括号，那么和当前栈顶的元素的括号进行批匹配，如果匹配成功，那么直接将栈顶出栈。
- * 3.当i下标对应的字符串和栈顶的字符串不能够匹配的时候，那么说明，右括号匹配错位
- * 4.当遍历结束后，如果i下标已经没有元素，此时栈内为空，那么字符串就完成匹配
- * （4.1）如果i下标还有元素，但是栈内为空，说明此时右括号多，此时匹配失败
- * （4.2）如果i下标没有元素，但是栈内还有元素，说明此时左括号多，此时也匹配失败
+ * 将十万个数据，统计重复数字出现的次数
  */
 public class TestDemo7 {
-
-    public static boolean isValid(String s) {
-        Stack<Character> stack = new Stack<>();
-        //首先遍历字符串
-        for (int i = 0; i < s.length(); i++) {
-            //然后遇见左括号“（”，“[”，“{”的时候入栈
-            if(s.charAt(i) == '(' || s.charAt(i) == '[' || s.charAt(i) == '{'){
-                stack.push(s.charAt(i));
-            }else if(stack.empty()){
-                System.out.println("说明右括号多");
+    public static void main(String[] args) {
+        //首先生成十万个数据
+        Random random = new Random();
+        //然后讲个十万个随机数放入到list当中
+        ArrayList<Integer> arrayList = new ArrayList<>();
+        for (int i = 0; i < 10_0000; i++) {
+            arrayList.add(random.nextInt(6_0000));
+        }
+        //然后使用hashMap,然后开始遍历list中的数据，在放进去之前首先得判断一下是否包含key，如果包含的话，那么就将value+1，如果不包含，那么就接着遍历下一个
+        Map<Integer,Integer> map = new HashMap<>();
+        for (Integer value: arrayList
+             ) {
+            if(map.get(value) == null){
+                map.put(value,1);
             }else {
-                char ch = stack.peek();
-                if(ch == '('&&s.charAt(i) == ')'||ch == '['&&s.charAt(i) == ']'||ch == '{'&&s.charAt(i) == '}'){
-                    System.out.println("字符串匹配成功");
-                    stack.pop();
-                }else {
-                    System.out.println("匹配失败");
-                    return false;
-                }
+                map.put(value,map.get(value)+1);
             }
         }
-        if(!stack.empty()){
-            return false;
+        //然后遍历map
+        for (Map.Entry<Integer,Integer> entry:map.entrySet()
+             ) {
+            System.out.println("重复的数字"+entry.getKey()+" "+"重复次数"+entry.getValue());
         }
-        return true;
-    }
-    public static void main(String[] args) {
-        String str =  "([)]";
-        isValid(str);
     }
 }
